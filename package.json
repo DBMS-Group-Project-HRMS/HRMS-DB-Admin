@@ -1,0 +1,27 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "cd admin && npm run build",
+    "install-admin": "cd admin && npm install",
+    "heroku-postbuild": "npm run install-admin && npm run build",
+    "start": "node app.js",
+    "server": "nodemon app.js",
+    "admin": "npm run start --prefix admin",
+    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run admin\""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "concurrently": "^7.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "mysql": "^2.18.1"
+  }
+}
