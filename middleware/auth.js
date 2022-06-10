@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken');
 
 let requireAuth = (req, res, next) => {
 
+    let errmsg = "Your login session has expired, please re-login to proceed!";
+
     let token;
     try {
         token = req.headers['token'].replace(/['"]+/g, '');
@@ -9,7 +11,7 @@ let requireAuth = (req, res, next) => {
     catch (err) {
         res.json({
             status: 'error',
-            error: "Your login session has expired, please re-login to proceed!"
+            error: errmsg
         });
     }
 
@@ -20,7 +22,7 @@ let requireAuth = (req, res, next) => {
                 console.log(err.message);
                 res.json({
                     status: 'error',
-                    error: "Your login session has expired, please re-login to proceed!"
+                    error: errmsg
                 });
             }
             else{
@@ -32,7 +34,7 @@ let requireAuth = (req, res, next) => {
         console.log('not token');
         res.json({
             status: 'error',
-            error: "Your login session has expired, please re-login to proceed!"
+            error: errmsg
         });
     }
 
@@ -47,7 +49,7 @@ let requireRouteAuth = (req, res, next) => {
     catch (err) {
         res.json({
             status: 'auth-error',
-            error: "Your login session has expired, please re-login to proceed!"
+            error: errmsg
         });
     }
 
@@ -58,7 +60,7 @@ let requireRouteAuth = (req, res, next) => {
                 console.log(err.message);
                 res.json({
                     status: 'auth-error',
-                    error: "Your login session has expired, please re-login to proceed!"
+                    error: errmsg
                 });
             }
             else{
@@ -70,7 +72,7 @@ let requireRouteAuth = (req, res, next) => {
         console.log('not token');
         res.json({
             status: 'auth-error',
-            error: "Your login session has expired, please re-login to proceed!"
+            error: errmsg
         });
     }
 
