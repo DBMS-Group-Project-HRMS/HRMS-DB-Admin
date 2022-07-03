@@ -3,13 +3,12 @@ const jwt = require('jsonwebtoken');
 let requireAuth = (req, res, next) => {
 
     let errmsg = "Your login session has expired, please re-login to proceed!";
-
     let token;
     try {
         token = req.headers['token'].replace(/['"]+/g, '');
     }
     catch (err) {
-        res.json({
+        return res.json({
             status: 'error',
             error: errmsg
         });
@@ -20,7 +19,7 @@ let requireAuth = (req, res, next) => {
         jwt.verify(token, process.env.JWT_ENV, (err, decodedToken) => {
             if(err){
                 console.log(err.message);
-                res.json({
+                return res.json({
                     status: 'error',
                     error: errmsg
                 });
@@ -32,7 +31,7 @@ let requireAuth = (req, res, next) => {
     }
     else{
         console.log('not token');
-        res.json({
+        return res.json({
             status: 'error',
             error: errmsg
         });
@@ -47,7 +46,7 @@ let requireRouteAuth = (req, res, next) => {
         token = req.headers['token'].replace(/['"]+/g, '');
     }
     catch (err) {
-        res.json({
+        return res.json({
             status: 'auth-error',
             error: errmsg
         });
@@ -58,7 +57,7 @@ let requireRouteAuth = (req, res, next) => {
         jwt.verify(token, process.env.JWT_ENV, (err, decodedToken) => {
             if(err){
                 console.log(err.message);
-                res.json({
+                return res.json({
                     status: 'auth-error',
                     error: errmsg
                 });
@@ -70,7 +69,7 @@ let requireRouteAuth = (req, res, next) => {
     }
     else{
         console.log('not token');
-        res.json({
+        return res.json({
             status: 'auth-error',
             error: errmsg
         });
@@ -79,10 +78,20 @@ let requireRouteAuth = (req, res, next) => {
 };
 
 const maxAge = 1 * 24 * 60 * 60;
-const createToken = () => {
-    return jwt.sign({value: Date.now()}, process.env.JWT_ENV, {
-        expiresIn: maxAge
-    });
+const createToken = async (user) => {
+    const accessToken = await jwt.sign(
+        {
+            username: user.username,
+            userId: user.id,
+            role: user.type,
+            paygrade: user.paygrade,
+        },
+        process.env.JWT_ENV,
+        {
+            expiresIn: maxAge
+        }
+        );
+        return accessToken;
 };
 
 module.exports = {

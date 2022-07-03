@@ -13,4 +13,6 @@ router.post('/addHR', auth.requireAuth, adminController.postAddHRM);
 // get HR manager details
 router.get('/getHRM', auth.requireAuth, adminController.getHRM);
 
+router.get("/getDetails", auth.requireAuth, adminController.getDetails);
+
 module.exports = router;

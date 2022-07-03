@@ -1,122 +1,159 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Modal, ModalHeader, ModalBody, Label, Col, Row } from 'reactstrap';
-import { Button, Container, Nav, Navbar } from "react-bootstrap";
-import { Control, Errors, LocalForm } from 'react-redux-form';
-import { Toast } from 'primereact/toast';
+import { Form, Input, Label} from 'reactstrap';
+import Axios from 'axios';
 
-const required = (val) => val && val.length;
+//const required = (val) => val && val.length;
 
-async function loginAdmin(data) {
+// async function loginAdmin(data) {
 
-    return fetch('http://localhost:5000/admin/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-      .then(data => data.json())
-}
+//     return fetch('http://localhost:5000/admin/login', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json'
+//       },
+//       body: JSON.stringify(data)
+//     })
+//       .then(data => data.json())
+// }
 
-function LoginSignup(props){
+// function LoginSignup(props){
 
+//     let navigate = useNavigate();
+
+//     const [loginError, setLoginError] = useState('');
+//     const [value, setValue] = useState('');
+//     const toast = useRef(null);
+
+//     const handleLogin = async (event) => {
+
+//         sessionStorage.clear();
+
+//         let response = await loginAdmin({
+//             username: event.username,
+//             password: event.password
+//         });
+
+//         if(response){
+//             if(response.status === 'error'){
+//                 setLoginError(response.error );
+//                 toast.current.show({severity:'error', summary: `${response.error}`, detail: "Invalid login details!", life: 5000});
+//             }
+//             else{
+
+//                 // sessionStorage.setItem('userType', JSON.stringify(response.userType));
+//                 // sessionStorage.setItem('userData', JSON.stringify(response.data));
+
+//                 // props.setAuthState(response);
+
+//                 sessionStorage.setItem('token', JSON.stringify(response.token));
+//                 navigate('/adminDashboard', { replace: true });
+//             }
+//         }
+//         else{
+//             let error = 'Authentication error!';
+//             setLoginError(error );
+//             toast.current.show({severity:'error', summary: `${error}`, detail: "Invalid login details!", life: 5000});
+//         }
+//     }
+export function LoginSignup() {
     let navigate = useNavigate();
 
-    const [loginError, setLoginError] = useState('');
-    const [value, setValue] = useState('');
-    const toast = useRef(null);
+    const [username, setUserName] = useState("");
+    const [password, setPassword] = useState("");
+    const initialValues = { username: "", password: "" };
+    const [formValues, setformValues] = useState(initialValues);
+    const [isSubmit, setIsSubmit] = useState(false);
+    const [alertType, setAlertType] = useState("");
+    const [alertMessage, setAlertMessage] = useState("");
+    const [show, setShow] = useState(false);
 
-    const handleLogin = async (event) => {
+    useEffect(() => {
+        setUserName(formValues.username);
+        setPassword(formValues.password);
+    }, [isSubmit, formValues]);
 
-        sessionStorage.clear();
-
-        let response = await loginAdmin({
-            username: event.username,
-            password: event.password
-        });
-
-        if(response){
-            if(response.status === 'error'){
-                setLoginError(response.error );
-                toast.current.show({severity:'error', summary: `${response.error}`, detail: "Invalid login details!", life: 5000});
-            }
-            else{
+    useEffect(() => {
+        if (isSubmit){
+            Axios.post('http://localhost:8087/admin/login', formValues)
+          .then((response) => {
+            sessionStorage.clear();
 
                 // sessionStorage.setItem('userType', JSON.stringify(response.userType));
                 // sessionStorage.setItem('userData', JSON.stringify(response.data));
 
                 // props.setAuthState(response);
-
-                sessionStorage.setItem('token', JSON.stringify(response.token));
+                sessionStorage.setItem('token', JSON.stringify(response.data.token));
                 navigate('/adminDashboard', { replace: true });
-            }
+        }).catch((err)=>{
+            setAlertType("alert alert-danger");
+            setAlertMessage("");
+            switch (err.response.request.status) {
+              case 400:
+                setAlertMessage(err.response.data.message);
+                setShow(true);
+                break;
+              case 500:
+                setAlertMessage("Server Error!");
+                setShow(true);
+                break;
+              case 501:
+                setAlertMessage("Server Error!");
+                setShow(true);
+                break;
+              case 502:
+                setAlertMessage("Server Error!");
+                setShow(true);
+                break;
+              default:
+                break;
+        }});
         }
-        else{
-            let error = 'Authentication error!';
-            setLoginError(error );
-            toast.current.show({severity:'error', summary: `${error}`, detail: "Invalid login details!", life: 5000});
-        }
-    }
+        setIsSubmit(false);
+        }, [isSubmit, username, password]);
+    
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setformValues({ ...formValues, [name]: value });
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setIsSubmit(true);
+    };
 
     return (
-        <div>
-            <Toast ref={toast} position="top-right" />
-            <LocalForm onSubmit={(values) => handleLogin(values)}>
-                <Row className="form-group">
-                    <Label htmlFor="username" md={3}>Username</Label>
-                    <Col md={9}>
-                        <Control.text model=".username" id="username" name="username"
-                            placeholder="Username"
-                            className="form-control"
-                            validators={{
-                                required
-                            }}
-                        />
-                        <Errors
-                            className="text-danger"
-                            model=".username"
-                            show="touched"
-                            messages={{
-                                required: 'Required'
-                            }}
-                            wrapper="ul"
-                            component="li"
-                        />
-                    </Col>
-                </Row>
-                <Row className="form-group">
-                    <Label htmlFor="password" md={3}>Password</Label>
-                    <Col md={9}>
-                        <Control.password model=".password" id="password" name="password"
-                            placeholder="Password"
-                            className="form-control"
-                            validators={{
-                                required
-                            }}
-                        />
-                        <Errors
-                            className="text-danger"
-                            model=".password"
-                            show="touched"
-                            messages={{
-                                required: 'Required'
-
-                            }}
-                            wrapper="ul"
-                            component="li"
-                        />
-                    </Col>
-                </Row>
-                <Row className="form-group">
-                    <Col md={{ size: 9, offset: 3 }}>
-                        <Button type="submit" color="primary">
-                            Login
-                        </Button>
-                    </Col>
-                </Row>
-            </LocalForm>
+        <div className="container w-25 shadow mt-5">
+        <div style={{ visibility: show ? "visible" : "hidden" }} className={alertType} role="alert">
+            {alertMessage}
+         </div>
+        <div className="col-6">
         </div>
+          <div className="loginBody"> 
+            <div className='login'>
+                <h2 > Human Resource Management System </h2>
+                <div className="row">
+                  <div>
+                    <Form onSubmit={handleSubmit}>
+                        <div className="mb-3">
+                            <Label className="form-label">Username</Label>
+                            <Input id="username" type="text"  value={formValues.username} onChange={handleChange} className="form-group" name="username" required/>
+                        </div>
+                        
+                        <div className="mb-3">
+                            <Label className="form-label">Password</Label>
+                            <Input type="password" value={formValues.password} onChange={handleChange} className="form-group" name="password" required/>
+                        </div>
+                        
+                        <button className="btn btn-primary mb-3">
+                            Sign In
+                        </button>
+                    </Form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
     );
 }
 
