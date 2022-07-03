@@ -60,7 +60,7 @@ const postAddHRM = async (req, res) => {
     let username = data.user.username;
     let hashed_password = await enc.encryptCredential(data.user.password);
 
-    let sql1    = `SELECT count(employee.ID) as count FROM employee left outer join user on employee.user_Id = user.ID WHERE type = 2 or email = "${con.escape(data.email)}" or employee.nic_number = "${con.escape(data.nic_number)}" or user.username = "${con.escape(username)}"`;
+    let sql1    = `SELECT count(employee.ID) as count FROM employee left outer join user on employee.user_Id = user.ID WHERE or email = "${con.escape(data.email)}" or employee.nic_number = "${con.escape(data.nic_number)}" or user.username = "${con.escape(username)}"`;
     con.query(sql1, (err, result) => {
 
         if(err){
@@ -73,7 +73,7 @@ const postAddHRM = async (req, res) => {
         else if(result[0].count > 0){
             res.json({
                 status: 'error',
-                error: "HR Manager, email, username or NIC already exists!"
+                error: "Email, username or NIC already exists!"
             });
         }
 
@@ -176,10 +176,63 @@ const postAddHRM = async (req, res) => {
     })
 }
 
+const getHRM = async (req,res) => {
+
+    const emp_sql = `select * from employee where type = 2`;
+    
+    con.query(emp_sql, (err, emp_result) => {
+
+        if(err){
+            console.log(err);
+            res.json({
+                status: 'error',
+                error: err.sqlMessage
+            });
+        }
+        else if(emp_result.length > 0){
+            console.log("ok")
+            res.json({
+                status: 'ok',
+                result: emp_result
+            });
+        }
+        else{
+            console.log("no hrm")
+            res.json({
+                status: 'empty',
+            });
+        }
+    })
+}
+
 module.exports = {
     postAdminLogin,
-    postAddHRM
+    postAddHRM,
+    getHRM,
 }
+
+// [
+//     [0]   RowDataPacket {
+//     [0]     ID: 4,
+//     [0]     firstname: "'testhr'",
+//     [0]     lastname: "'hrmanager'",
+//     [0]     birthday: 1990-05-09T18:30:00.000Z,
+//     [0]     email: "'hremail@gmail.com'",
+//     [0]     salary: 150000,
+//     [0]     Joined_date: 2019-04-24T18:30:00.000Z,
+//     [0]     nic_number: "'990567773v'",
+//     [0]     photo: null,
+//     [0]     leave_count: 0,
+//     [0]     department: 1,
+//     [0]     maritalStatus: 2,
+//     [0]     address: 6,
+//     [0]     type: 2,
+//     [0]     paygrade: 2,
+//     [0]     empStatus: 1,
+//     [0]     user_Id: 6,
+//     [0]     emergency_contact: 4
+//     [0]   }
+//     [0] ]
 
 // {
 //     firstname: 'testhr',
@@ -215,3 +268,4 @@ module.exports = {
 //         '0715643564'
 //     ]
 // }
+// let sql1    = `SELECT count(employee.ID) as count FROM employee left outer join user on employee.user_Id = user.ID WHERE type = 2 or email = "${con.escape(data.email)}" or employee.nic_number = "${con.escape(data.nic_number)}" or user.username = "${con.escape(username)}"`;

@@ -10,4 +10,7 @@ router.post('/login', adminController.postAdminLogin);
 // HR manager add post - postAddHRM
 router.post('/addHR', auth.requireAuth, adminController.postAddHRM);
 
+// get HR manager details
+router.get('/getHRM', auth.requireAuth, adminController.getHRM);
+
 module.exports = router;
