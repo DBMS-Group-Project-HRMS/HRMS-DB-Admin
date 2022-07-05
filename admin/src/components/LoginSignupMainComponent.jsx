@@ -67,6 +67,8 @@ export function LoginSignup() {
     const [alertType, setAlertType] = useState("");
     const [alertMessage, setAlertMessage] = useState("");
     const [show, setShow] = useState(false);
+    const port = process.env.PORT || 5000;
+    const address = "http://localhost:"+port+"/admin/login";
 
     useEffect(() => {
         setUserName(formValues.username);
