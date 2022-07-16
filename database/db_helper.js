@@ -18,6 +18,7 @@ var config =
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
     port: 3306,
+    multipleStatements: true,
     ssl: {ca: fs.readFileSync(__dirname +'/DigiCertGlobalRootCA.crt.pem')}
 };
 
